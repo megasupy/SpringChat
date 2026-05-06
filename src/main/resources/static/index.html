@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+  <head>
+    <title>SpringChat</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  </head>
+  <body>
+    <main class="container"> 
+      <!-- do main with style container for picocss-->
+      <header>
+        <h1>
+          Welcome to SpringChat
+        </h1>
+        <h3><em>A chat app created with Spring Boot, HTMX, and PicoCSS</em></h3>
+      </header>
+
+      <section>
+        <div class="grid">
+          <a href="/login.html" role="button">Log In</a>
+          <a href="/signup.html" role="button">Sign Up</a>
+        </div>
+      </section>
+
+      <header>
+        <h3>Messages</h3>
+      </header>
+      <article>
+        <div id="messages" hx-get="/html/message" hx-trigger="load" hx-target="#messages"></div>
+      </article>
+    </main>
+  </body>
+</html>

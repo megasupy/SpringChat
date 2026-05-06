@@ -1,6 +1,5 @@
 package com.example.demo;
 
-import java.sql.ResultSet;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,29 +8,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 
-class Message {
-    public UUID sender_id;
-    public String messageText;
-    public UUID recipient_id;
-}
 
 @RestController
 public class MessageController {
     @Autowired
-    JdbcTemplate template;
-
-    @GetMapping("/users/gettwo")
-    public List<UUID> Get2UserIDs() {
-        String sql = "SELECT id FROM users LIMIT 2;";
-        return template.query(sql, (ResultSet rs, int rowNum) -> {
-            return rs.getObject("id", UUID.class);
-        }
-        );
-    }
+    MessageRepository repository;
 
     @GetMapping("/hello")
     public String hello() {
@@ -45,39 +28,42 @@ public class MessageController {
     */
     @GetMapping("/message")
     public ResponseEntity<List<Message>> getMessages() {
-        String sql = "SELECT sender_id, message, recipient_id FROM messages;";
-        List<Message> result = template.query(sql, (ResultSet rs, int rowNum) -> {
-            Message m = new Message();
-            m.sender_id = rs.getObject("sender_id", UUID.class);
-            m.recipient_id = rs.getObject("recipient_id", UUID.class);
-            m.messageText = rs.getObject("message", String.class);
-            return m;
-        });
+        List<Message> result = repository.getAll(); 
         return ResponseEntity.ok().body(result);
+    }
+
+    @GetMapping("/html/message")
+    public String getMessagesHTML() {
+        List<Message> result = repository.getAll();
+        String html = "";
+        for (Message m : result) {
+            html += "<p>" + m.message + "</p>";
+        }
+
+        return html;
 
     }
 
     @PostMapping("/message") 
     public ResponseEntity<String> sendMessage(@RequestBody Message msg) {
-        String sql = "INSERT INTO messages (sender_id, recipient_id, message) VALUES (?, ?, ?);";
-        template.update(sql, new Object[]{msg.sender_id, msg.recipient_id, msg.messageText});
-        return ResponseEntity.status(HttpStatus.CREATED).body("Inserted \"" + msg.messageText + "\"");
+        repository.insert(msg);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Inserted \"" + msg.message + "\"");
     }
 
     @PostMapping("/message-test") 
     /*
     Test with:
     cmd:
-    curl --json '{"messageText":"Hey All!"}' localhost:8080/message-test
+    curl --json '{"message":"Hey All!"}' localhost:8080/message-test
     result:
     Inserted Hey All!
     */
     public ResponseEntity<String> sendMessageTest(@RequestBody Message msg) {
-        List<UUID> userIDs = Get2UserIDs();
-        if (userIDs.size() < 2) return ResponseEntity.internalServerError().body("Could not find two User IDs");
-        String sql = "INSERT INTO messages (sender_id, recipient_id, message) VALUES (?, ?, ?);";
-        template.update(sql, new Object[]{userIDs.get(0), userIDs.get(1), msg.messageText});
-        return ResponseEntity.status(HttpStatus.CREATED).body("Inserted \"" + msg.messageText + "\"");
+        List<UUID> userIDs = repository.get2UserIDs();
+        msg.sender_id = userIDs.get(0);
+        msg.recipient_id = userIDs.get(1);
+        repository.insert(msg);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Inserted \"" + msg.message + "\"");
     }
     
 }
