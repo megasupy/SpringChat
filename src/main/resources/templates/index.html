@@ -6,6 +6,28 @@
   </head>
   <body>
     <main class="container"> 
+      <nav>
+        <ul>
+          <li><a href="/" class="secondary"><strong>SpringChat</strong></a></li>
+        </ul>
+        <ul>
+
+          <li th:unless="${loggedin}">
+            <a href="/login" role="button">Log In</a>
+          </li>
+
+          <li th:unless="${loggedin}">
+            <a href="/signup" role="button">Sign Up</a>
+          </li>
+          <li th:if="${loggedin}">
+            <a href="/chat" role="button">Chat</a>
+          </li>
+          <li th:if="${loggedin}">
+            <a href="#" role="button" class="contrast" hx-post="/logout" hx-trigger="click">Log Out</a>
+          </li>
+        </ul>
+      </nav>
+      <hr>
       <!-- do main with style container for picocss-->
       <header>
         <h1>
@@ -14,19 +36,7 @@
         <h3><em>A chat app created with Spring Boot, HTMX, and PicoCSS</em></h3>
       </header>
 
-      <section>
-        <div class="grid">
-          <a href="/login" role="button">Log In</a>
-          <a href="/signup" role="button">Sign Up</a>
-        </div>
-      </section>
-
-      <header>
-        <h3>Messages</h3>
-      </header>
-      <article>
-        <div id="messages" hx-get="/html/message" hx-trigger="load" hx-target="#messages"></div>
-      </article>
+      <!-- Use model attribute ${loggedin}, not ${param.loggedin} (that's a URL ?param thing). -->
     </main>
   </body>
 </html>

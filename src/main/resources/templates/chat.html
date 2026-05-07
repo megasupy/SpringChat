@@ -1,0 +1,34 @@
+
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"> 
+  <head>
+    <title>SpringChat</title>
+    <th:block th:replace="~{fragments/defaulthead :: defaulthead}"></th:block>
+  </head>
+  <body>
+    <main class="container"> 
+      <nav>
+        <ul>
+          <li><a href="/" class="secondary"><strong>SpringChat</strong></a></li>
+        </ul>
+        <ul>
+          <li>
+            <details class="dropdown">
+              <summary>
+                Contacts
+              </summary>
+              <ul id="contacts" hx-get="/contacts" hx-trigger="load" hx-target="#contacts"></ul>
+            </details>
+          </li>
+        </ul>
+      </nav>
+      <header>
+        <h3>Messages</h3>
+      </header>
+      <div id="messages" hx-get="/html/message" hx-trigger="load" hx-target="#messages"></div>
+      <p th:text="${username}"></p>
+      <section>
+      </section>
+    </main>
+  </body>
+</html>

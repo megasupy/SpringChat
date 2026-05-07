@@ -18,14 +18,18 @@
         <button type="submit">Log in</button>
       </form>
 
+      <section>
       <div th:if="${param.error}">
         Invalid username and password.
       </div>
       <div th:if="${param.logout}">
         You have been logged out.
       </div>
+      </section>
 
-      <a href="/" role="button" class="secondary">Back Home</a>
+      <section>
+        <a href="/" role="button" class="secondary">Back Home</a>
+      </section>
 
     </main>
   </body>

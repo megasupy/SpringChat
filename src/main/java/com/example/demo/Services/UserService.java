@@ -1,25 +1,23 @@
-package com.example.demo;
+package com.example.demo.Services;
 
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-class SignupResult {
-}
-
+import com.example.demo.Repositories.UserRepository;
 
 @Service
 public class UserService {
     @Autowired
     private UserRepository repo;
 
-    private PasswordEncoder encoder = new BCryptPasswordEncoder();
+    @Autowired
+    private PasswordEncoder encoder;
 
-    final int minPasswordLength = 10;
+    private final int minPasswordLength = 10;
 
     /* 
     ===================

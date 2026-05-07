@@ -1,20 +1,12 @@
-package com.example.demo;
+package com.example.demo.Repositories;
 
 import java.sql.ResultSet;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-
-class Message {
-    public UUID id;
-    public UUID sender_id;
-    public String message;
-    public UUID recipient_id;
-    public Timestamp created_at;
-}
+import com.example.demo.Models.Message;
 
 @Repository
 public class MessageRepository {

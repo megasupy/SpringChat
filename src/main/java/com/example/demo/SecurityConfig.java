@@ -12,6 +12,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 
+// So, spring can handle sessions for you! That said, you need to use their login page to make it easy.
+// Using your own way of doing things is generally not documented as easily as their ways of doing it.
+// That said, they do a decent job of showing how to do a user service. As long as you do that you're fine.
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -21,9 +24,14 @@ public class SecurityConfig {
 			.authorizeHttpRequests((authorize) -> authorize
 				.requestMatchers("/public/**", "/", "/login", "/signup").permitAll()
 				.anyRequest().authenticated()
-			)
+			).anonymous((anon) -> anon.disable())
             .formLogin((login) ->
             login.loginPage("/login"))
+            .logout((logout) -> {
+                logout.logoutSuccessHandler(((request, response, authentication) -> {
+                    response.setHeader("HX-Redirect", "/login");
+                }));
+            })
         ;
 
 		return http.build();

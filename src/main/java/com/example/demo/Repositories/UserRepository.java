@@ -1,6 +1,5 @@
-package com.example.demo;
-import java.sql.ResultSet;
-import java.sql.Timestamp;
+package com.example.demo.Repositories;
+
 import java.util.UUID;
 import java.util.List;
 
@@ -8,55 +7,49 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-
-class MyUser {
-    UUID id;
-    String username;
-    String password_hashed;
-    Timestamp created_at;
-}
+import org.springframework.jdbc.core.RowMapper;
+import com.example.demo.Models.MyUser;
 
 @Repository
-class UserRepository {
+public class UserRepository {
     @Autowired
     JdbcTemplate template;
 
-    public List<MyUser> getAll() {
-        String sql = "SELECT * FROM users;";
-        List<MyUser> result = template.query(sql, (ResultSet rs, int rowNum) -> {
+    final private RowMapper<MyUser> rowMapper = (rs, rowNum) -> {
             MyUser m = new MyUser();
             m.id = rs.getObject("id", UUID.class);
             m.username = rs.getString("username");
             m.password_hashed = rs.getString("password_hashed");
             m.created_at = rs.getTimestamp("created_at");
             return m;
-        });
+    };
+    public List<MyUser> getAll() {
+        String sql = "SELECT * FROM users;";
+        List<MyUser> result = template.query(sql, rowMapper);
         return result;
     }
 
     public MyUser get(UUID id) {
         String sql = "SELECT * FROM users WHERE id = ?;";
-        MyUser result = template.queryForObject(sql, (ResultSet rs, int rowNum) -> {
-            MyUser m = new MyUser();
-            m.id = rs.getObject("id", UUID.class);
-            m.username = rs.getString("username");
-            m.password_hashed = rs.getString("password_hashed");
-            m.created_at = rs.getTimestamp("created_at");
-            return m;
-        }, id); 
+        MyUser result = template.queryForObject(sql, rowMapper, id); 
         return result;
     }
 
     public MyUser getByUsername(String username) throws DataAccessException {
         String sql = "SELECT * FROM users WHERE username = ?;";
-        MyUser result = template.queryForObject(sql, (ResultSet rs, int rowNum) -> {
-            MyUser m = new MyUser();
-            m.id = rs.getObject("id", UUID.class);
-            m.username = rs.getString("username");
-            m.password_hashed = rs.getString("password_hashed");
-            m.created_at = rs.getTimestamp("created_at");
-            return m;
-        }, username );
+        MyUser result = template.queryForObject(sql, rowMapper, username );
+        return result;
+    }
+
+    public List<MyUser> getAllExcept(String username) throws DataAccessException {
+        String sql = "SELECT * FROM users WHERE username != ?;";
+        List<MyUser> result = template.query(sql, rowMapper, username);
+        return result;
+    }
+
+    public List<MyUser> searchByUsername(String username_fragment) throws DataAccessException {
+        String sql = "SELECT * FROM users WHERE username LIKE ?;";
+        List<MyUser> result = template.query(sql, rowMapper, "%" + username_fragment + "%");
         return result;
     }
 
