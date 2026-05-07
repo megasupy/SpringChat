@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-class User {
+class MyUser {
     UUID id;
     String username;
     String password_hashed;
@@ -20,10 +20,10 @@ class UserRepository {
     @Autowired
     JdbcTemplate template;
 
-    public List<User> getAll() {
+    public List<MyUser> getAll() {
         String sql = "SELECT * FROM users;";
-        List<User> result = template.query(sql, (ResultSet rs, int rowNum) -> {
-            User m = new User();
+        List<MyUser> result = template.query(sql, (ResultSet rs, int rowNum) -> {
+            MyUser m = new MyUser();
             m.id = rs.getObject("id", UUID.class);
             m.username = rs.getString("username");
             m.password_hashed = rs.getString("password_hashed");
@@ -33,10 +33,10 @@ class UserRepository {
         return result;
     }
 
-    public User get(UUID id) {
+    public MyUser get(UUID id) {
         String sql = "SELECT * FROM users WHERE id = ?;";
-        User result = template.queryForObject(sql, (ResultSet rs, int rowNum) -> {
-            User m = new User();
+        MyUser result = template.queryForObject(sql, (ResultSet rs, int rowNum) -> {
+            MyUser m = new MyUser();
             m.id = rs.getObject("id", UUID.class);
             m.username = rs.getString("username");
             m.password_hashed = rs.getString("password_hashed");
@@ -46,10 +46,10 @@ class UserRepository {
         return result;
     }
 
-    public User getByUsername(String username) {
+    public MyUser getByUsername(String username) {
         String sql = "SELECT * FROM users WHERE username = ?;";
-        User result = template.queryForObject(sql, (ResultSet rs, int rowNum) -> {
-            User m = new User();
+        MyUser result = template.queryForObject(sql, (ResultSet rs, int rowNum) -> {
+            MyUser m = new MyUser();
             m.id = rs.getObject("id", UUID.class);
             m.username = rs.getString("username");
             m.password_hashed = rs.getString("password_hashed");
