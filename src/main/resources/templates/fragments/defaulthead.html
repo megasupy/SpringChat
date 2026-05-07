@@ -1,0 +1,18 @@
+<th:block th:fragment="defaulthead">
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+  <meta name="_csrf" th:content="${_csrf.token}">
+  <meta name="_csrf_header" th:content="${_csrf.headerName}">
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      document.body.addEventListener('htmx:configRequest', function (event) {
+        var t = document.querySelector('meta[name="_csrf"]');
+        var h = document.querySelector('meta[name="_csrf_header"]');
+        if (t && h && t.content) {
+          event.detail.headers[h.content] = t.content;
+        }
+      });
+    });
+  </script>
+</th:block>

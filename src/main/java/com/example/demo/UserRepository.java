@@ -5,6 +5,7 @@ import java.util.UUID;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -46,7 +47,7 @@ class UserRepository {
         return result;
     }
 
-    public MyUser getByUsername(String username) {
+    public MyUser getByUsername(String username) throws DataAccessException {
         String sql = "SELECT * FROM users WHERE username = ?;";
         MyUser result = template.queryForObject(sql, (ResultSet rs, int rowNum) -> {
             MyUser m = new MyUser();

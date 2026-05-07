@@ -1,10 +1,8 @@
 <!doctype html>
-<html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"> 
   <head>
     <title>SpringChat</title>
-    <html lang="en" xmlns:th="http://www.thymeleaf.org">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <th:block th:replace="~{fragments/defaulthead :: defaulthead}"></th:block>
   </head>
   <body>
     <main class="container"> 
@@ -12,9 +10,9 @@
         <h1>Sign Up</h1>
       </header>
 
-      <form hx-post="/public/signup" hx-target="#signup-result">
+      <form hx-post="/public/html/signup" hx-target="#signup-result">
         <input name="username" placeholder="Type Username">
-        <input name="password_unhashed" placeholder="Type Password">
+        <input name="password_unhashed" type="password" placeholder="Type Password">
         <button type="submit">Sign Up</button>
       </form>
 

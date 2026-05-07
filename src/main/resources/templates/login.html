@@ -1,21 +1,9 @@
 <!doctype html>
-<html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"> 
   <head>
     <title>SpringChat</title>
-    <html lang="en" xmlns:th="http://www.thymeleaf.org">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
-    <meta name="_csrf" th:content="${_csrf.token}" content="(see source: _csrf.token when server-rendered)" />
-    <meta name="_csrf_header" th:content="${_csrf.headerName}" content="(see source: _csrf.headerName when server-rendered)" />
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <script>
-      document.body.addEventListener('htmx:configRequest', function (event) {
-        var t = document.querySelector('meta[name=_csrf]');
-        var h = document.querySelector('meta[name=_csrf_header]');
-        if (t && h && t.content) {
-          event.detail.headers[h.content] = t.content;
-        }
-      });
-    </script>
+   
+    <th:block th:replace="~{fragments/defaulthead :: defaulthead}"></th:block>
   </head>
   <body>
     <main class="container"> 
@@ -23,15 +11,22 @@
         <h1>Log In</h1>
       </header>
 
-      <form hx-post="/public/login" hx-target="#login-result">
+      <!-- use the default form they use at spring boot docs -->
+      <form th:action="@{/login}" method="post">
         <input name="username" placeholder="Type Username">
-        <input name="password" placeholder="Type Password">
+        <input name="password" type="password" minlength="8" placeholder="Type Password">
         <button type="submit">Log in</button>
       </form>
 
-      <div id="login-result"></div>
+      <div th:if="${param.error}">
+        Invalid username and password.
+      </div>
+      <div th:if="${param.logout}">
+        You have been logged out.
+      </div>
 
-      <a href="/" role="button" class="secondary">Back Home</a>  
+      <a href="/" role="button" class="secondary">Back Home</a>
+
     </main>
   </body>
 </html>

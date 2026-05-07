@@ -84,17 +84,4 @@ public class UserService {
         }
         return Optional.empty();
     }
-
-    /* 
-    ===================
-    Log In
-    ===================
-    */
-
-    public Optional<UUID> login(String username, String password_unhashed) {
-        MyUser u = repo.getByUsername(username);
-        boolean correctPass = encoder.matches(password_unhashed, u.password_hashed);
-        if (correctPass) return Optional.of(u.id);
-        else return Optional.empty();
-    }
 }
