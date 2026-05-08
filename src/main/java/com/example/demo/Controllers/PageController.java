@@ -26,8 +26,10 @@ public class PageController {
     }
 
     @GetMapping("/chat") 
-    public String chat(Model m, @RequestParam String userName) {
-        m.addAttribute("dummy", userName);
+    public String chat(Model m, @RequestParam(defaultValue = "") String contact_name) {
+        m.addAttribute("has_contact", !contact_name.equals(""));
+        m.addAttribute("contact_name", contact_name);
+
         return "chat";
     }
 }

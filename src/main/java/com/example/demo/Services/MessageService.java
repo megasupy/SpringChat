@@ -1,5 +1,7 @@
 package com.example.demo.Services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.stereotype.Service;
@@ -18,11 +20,13 @@ public class MessageService {
     @Autowired
     UserRepository userRepository;
 
+    int maxLimit = 100;
+
     private boolean userIsAuthorizedToSend(Message msg) {
         // might add a firends list or something later
         MyUser sender = userRepository.get(msg.sender_id);
         String username = AuthHelper.getUserName();
-        return (sender.username == username);
+        return (sender.username.equals(username));
     }
 
     public void sendMessage(Message msg) {
@@ -32,5 +36,39 @@ public class MessageService {
 
         messageRepository.insert(msg);
     }
+
+    public void sendMessage(String recipientName, String messageText) {
+        if (!AuthHelper.isLoggedIn()) {
+            throw new InsufficientAuthenticationException("Not Authorized to send this message!");
+        }
+
+        Message msg = new Message();
+        msg.recipient_id = userRepository.getByUsername(recipientName).id;
+        msg.sender_id = userRepository.getByUsername(AuthHelper.getUserName()).id;
+        msg.message = messageText;
+
+        messageRepository.insert(msg);
+    }
+
+    public class Conversation {
+        public List<Message> conversation;
+        public MyUser currentUser;
+        public MyUser contact;
+    }
+    public Conversation getConversation(String contactName, int limit, int offset) {
+        if (!AuthHelper.isLoggedIn()) {
+            throw new InsufficientAuthenticationException("User not logged in!");
+        }
+
+        if (limit > maxLimit) throw new IllegalArgumentException("Limit must less than: " + maxLimit);
+
+        Conversation response = new Conversation();
+        response.contact = userRepository.getByUsername(contactName);
+        response.currentUser = userRepository.getByUsername(AuthHelper.getUserName());
+        response.conversation = messageRepository.getConversation(response.currentUser.id, response.contact.id, limit, offset);
+        
+        return response;
+    }
+
 }
 

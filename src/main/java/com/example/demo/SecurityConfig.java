@@ -26,7 +26,9 @@ public class SecurityConfig {
 				.anyRequest().authenticated()
 			).anonymous((anon) -> anon.disable())
             .formLogin((login) ->
-            login.loginPage("/login"))
+                login.loginPage("/login")
+                .defaultSuccessUrl("/", true)
+            )
             .logout((logout) -> {
                 logout.logoutSuccessHandler(((request, response, authentication) -> {
                     response.setHeader("HX-Redirect", "/login");

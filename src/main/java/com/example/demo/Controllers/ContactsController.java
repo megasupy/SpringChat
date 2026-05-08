@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.HtmlUtils;
+
 import com.example.demo.Services.ContactsService;
 
 import com.example.demo.Models.MyUser;
@@ -16,15 +18,15 @@ public class ContactsController {
 
     @GetMapping("/contacts")
     public String myContacts() {
-        String html = "";
+        StringBuilder html = new StringBuilder();
 
         List<MyUser> contacts = service.getMyContacts();
         for (var contact : contacts) {
-            html += 
-                "<li hx-get=\"/chat?username=\"" + contact.username + "\" hx-trigger=\"click\">" 
-                + contact.username + "</li>";
+            String contactNameEscaped = HtmlUtils.htmlEscape(contact.username);
+            html.append("<li><a href=\"/chat?contact_name=").append(contactNameEscaped)
+                .append("\" >").append(contactNameEscaped).append("</a></li>");
         }
-        return html;
+        return html.toString();
     }
 }
 

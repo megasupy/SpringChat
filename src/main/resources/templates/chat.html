@@ -14,20 +14,41 @@
         <ul>
           <li>
             <details class="dropdown">
-              <summary>
+              <summary role="button" class="secondary">
                 Contacts
               </summary>
-              <ul id="contacts" hx-get="/contacts" hx-trigger="load" hx-target="#contacts"></ul>
+              <ul id="contacts" 
+                hx-get="/contacts"
+                hx-trigger="load"
+                hx-target="#contacts"></ul>
             </details>
           </li>
         </ul>
       </nav>
-      <header>
-        <h3>Messages</h3>
-      </header>
-      <div id="messages" hx-get="/html/message" hx-trigger="load" hx-target="#messages"></div>
-      <p th:text="${username}"></p>
-      <section>
+      <hr>
+      <section th:if="${has_contact}">
+        <header>
+          <h3>Messages: <span th:text="${contact_name}"></span></h3>
+        </header>
+        <div id="messages" 
+          th:attr="hx-get=@{/message(contact_name=${contact_name})}"
+          hx-trigger="load, every 5s" 
+          hx-target="#messages">
+        </div>
+        <form 
+          th:attr="hx-post=@{/message(contact_name=${contact_name})}"
+          hx-trigger="submit"
+          hx-target="#messages-response"
+        >
+          <textarea name="message_text" placeholder="Type Message"></textarea>
+          <button type="submit">Send</button>
+        </form>
+        <div id="messages-response"></div>
+      </section>
+      <section th:unless="${has_contact}">
+        <header>
+          <h3>No Contact Selected</h3>
+        </header>
       </section>
     </main>
   </body>

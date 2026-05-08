@@ -36,6 +36,9 @@ public class UserService {
     // We want to return the reason for an invalid signup data, or empty if it's good!
     // This is cause of HTMX
     public Optional<String> getInvalidInputReason(String username, String password) {
+        if (username.length() < 3) {
+            return Optional.of("Username must be larger than 2 characters!");
+        }
         if (repo.userNameExists(username)) {
             return Optional.of("Username already exists!");
         }
