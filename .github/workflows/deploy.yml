@@ -1,63 +1,50 @@
-# Deploys main/master to your VM over SSH after a successful Maven build.
+# Build runs ON THE VM (Maven), not on GitHub. This job only SSHs in and runs git + mvn + restart.
 #
-# GitHub repo → Settings → Secrets and variables → Actions → New repository secret:
-#   SSH_HOST          e.g. 4.3.2.1 or your VM public DNS
-#   SSH_USER          e.g. azureuser
-#   SSH_PRIVATE_KEY   full private key (-----BEGIN ... OPENSSH PRIVATE KEY-----)
+# Prerequisites on the server:
+#   - Git clone of this repo at DEPLOY_DIR (see job env below)
+#   - git remote "origin" = this GitHub repo (HTTPS or SSH)
+#   - JDK 21 + Maven on PATH for the SSH user (e.g. sudo apt install openjdk-21-jdk maven)
+#   - systemd service "springchat" + /etc/springchat.env (see deploy/springchat.service)
+#   - sudo NOPASSWD for: systemctl restart springchat (see comments in deploy/springchat.service)
 #
-# One-time on the server:
-#   1. sudo mkdir -p /home/azureuser/SpringChat
-#   2. sudo cp deploy/springchat.service /etc/systemd/system/springchat.service   (adjust paths if needed)
-#   3. sudo nano /etc/springchat.env   (see deploy/springchat.env.example)
-#   4. sudo chmod 600 /etc/springchat.env
-#   5. sudo systemctl daemon-reload && sudo systemctl enable springchat
-#   6. Allow your deploy user to restart the unit without a password, e.g.:
-#        sudo visudo -f /etc/sudoers.d/springchat-deploy
-#        azureuser ALL=(ALL) NOPASSWD: /bin/systemctl restart springchat, /bin/systemctl status springchat
+# Repository secrets (Settings → Secrets and variables → Actions):
+#   SSH_HOST        VM hostname or IP
+#   SSH_USER        e.g. azureuser
+#   SSH_PRIVATE_KEY Private key so Actions can SSH *into your VM* (pair with that user’s authorized_keys). Not a GitHub “deploy key.”
 #
-# Edit the REMOTE_JAR path below if your home directory or layout differs.
+# Public repo: git fetch/pull via HTTPS needs no GitHub credentials on the server.
+# Private repo: use a deploy key or HTTPS token so the server can fetch.
 
-name: Build and deploy
+name: Deploy (build on server)
 
 on:
   push:
     branches: [main, master]
   workflow_dispatch:
 
-env:
-  REMOTE_JAR: /home/azureuser/SpringChat/springchat.jar
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      # Must match clone path on the VM; edit if yours differs.
+      DEPLOY_DIR: /home/azureuser/SpringChat
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "21"
-          cache: maven
-
-      - name: Package
-        run: mvn -B -DskipTests package
-
-      - name: Upload JAR and restart service
+      - name: Pull, build on VM, restart springchat
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_USER: ${{ secrets.SSH_USER }}
         run: |
-          set -e
+          set -euo pipefail
           test -n "${SSH_PRIVATE_KEY}" && test -n "${SSH_HOST}" && test -n "${SSH_USER}" || {
             echo "Missing SSH_HOST, SSH_USER, or SSH_PRIVATE_KEY repository secrets."
             exit 1
           }
+          BRANCH="${{ github.ref_name }}"
           mkdir -p ~/.ssh
-          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/ci_vm_key
+          chmod 600 ~/.ssh/ci_vm_key
           ssh-keyscan -t ed25519,rsa "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
-          scp -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
-            target/springchat.jar "${SSH_USER}@${SSH_HOST}:${REMOTE_JAR}"
-          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new \
-            "${SSH_USER}@${SSH_HOST}" "sudo systemctl restart springchat"
+          ssh -i ~/.ssh/ci_vm_key -o StrictHostKeyChecking=accept-new \
+            "${SSH_USER}@${SSH_HOST}" \
+            "bash -lc \"set -euo pipefail; cd ${DEPLOY_DIR}; git fetch origin; git checkout ${BRANCH}; git pull --ff-only origin ${BRANCH}; mvn -B -DskipTests package; sudo systemctl restart springchat\""
