@@ -71,6 +71,8 @@
 	</dependencies>
 
 	<build>
+		<!-- Stable JAR name for deploy scripts and systemd ExecStart -->
+		<finalName>springchat</finalName>
 		<plugins>
 			<plugin>
         <groupId>org.springframework.boot</groupId>

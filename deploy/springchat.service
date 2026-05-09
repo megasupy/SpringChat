@@ -1,0 +1,26 @@
+# Install once on the server:
+#   sudo cp deploy/springchat.service /etc/systemd/system/springchat.service
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now springchat
+#
+# Edit User=/WorkingDirectory/ExecStart paths below if your deploy user or paths differ.
+
+[Unit]
+Description=SpringChat (Spring Boot)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=azureuser
+Group=azureuser
+WorkingDirectory=/home/azureuser/SpringChat
+ExecStart=/usr/bin/java -jar /home/azureuser/SpringChat/springchat.jar
+Restart=on-failure
+RestartSec=15
+EnvironmentFile=/etc/springchat.env
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
