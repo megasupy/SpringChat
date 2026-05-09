@@ -30,19 +30,22 @@
         <header>
           <h3>Messages: <span th:text="${contact_name}"></span></h3>
         </header>
-        <div id="messages" 
+        <div id="messages"
           th:attr="hx-get=@{/message(contact_name=${contact_name})}"
           hx-trigger="load, every 5s" 
-          hx-target="#messages">
+          hx-target="#messages"
+          hx-indicator="#chat-spinner">
         </div>
         <form 
           th:attr="hx-post=@{/message(contact_name=${contact_name})}"
           hx-trigger="submit"
           hx-target="#messages-response"
+          hx-on::after-request="if (event.detail.successful) this.reset()"
         >
           <textarea name="message_text" placeholder="Type Message"></textarea>
           <button type="submit">Send</button>
         </form>
+        <span id="chat-spinner" class="htmx-indicator" aria-hidden="true">Loading…</span>
         <div id="messages-response"></div>
       </section>
       <section th:unless="${has_contact}">

@@ -1,5 +1,6 @@
 <th:block th:fragment="defaulthead">
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
   <meta name="_csrf" th:content="${_csrf.token}">
   <meta name="_csrf_header" th:content="${_csrf.headerName}">
@@ -15,4 +16,19 @@
       });
     });
   </script>
+  <style>
+    // With this style, if we do hx-indicator="#some-element" where some element is like... 
+    // <span id="some-element" class="htmx-indicator" aria-hidden="true">Loading…</span>
+    // can't test cause things are too fast right now with no users
+    
+    .htmx-indicator {
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 150ms ease;
+    }
+    .htmx-request.htmx-indicator {
+      opacity: 1;
+      visibility: visible;
+    }
+  </style>
 </th:block>
