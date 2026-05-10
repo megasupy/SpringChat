@@ -2,7 +2,6 @@ package com.example.demo.Controllers;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.HtmlUtils;
@@ -13,8 +12,11 @@ import com.example.demo.Models.MyUser;
 
 @RestController
 public class ContactsController {
-    @Autowired
-    ContactsService service;
+    private final ContactsService service;
+
+    public ContactsController(ContactsService service) {
+        this.service = service;
+    }
 
     @GetMapping("/contacts")
     public String myContacts() {

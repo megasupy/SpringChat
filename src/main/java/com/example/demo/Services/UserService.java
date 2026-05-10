@@ -3,7 +3,6 @@ package com.example.demo.Services;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -11,11 +10,14 @@ import com.example.demo.Repositories.UserRepository;
 
 @Service
 public class UserService {
-    @Autowired
-    private UserRepository repo;
+    private final UserRepository repo;
 
-    @Autowired
-    private PasswordEncoder encoder;
+    private final PasswordEncoder encoder;
+
+    public UserService(UserRepository repo, PasswordEncoder encoder) {
+        this.repo = repo;
+        this.encoder = encoder;
+    }
 
     private final int minPasswordLength = 10;
 

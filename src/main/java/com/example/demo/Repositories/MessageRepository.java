@@ -3,7 +3,6 @@ package com.example.demo.Repositories;
 import java.sql.ResultSet;
 import java.util.List;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -11,8 +10,11 @@ import com.example.demo.Models.Message;
 
 @Repository
 public class MessageRepository {
-    @Autowired
-    private JdbcTemplate template;
+    private final JdbcTemplate template;
+
+    public MessageRepository(JdbcTemplate template) {
+        this.template = template;
+    }
 
     RowMapper<Message> rowMapper = (rs, rowNum) -> {
         Message m = new Message();

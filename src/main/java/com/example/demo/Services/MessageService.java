@@ -2,7 +2,6 @@ package com.example.demo.Services;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.stereotype.Service;
 
@@ -14,11 +13,14 @@ import com.example.demo.AuthHelper;
 
 @Service
 public class MessageService {
-    @Autowired
-    MessageRepository messageRepository;
+    private final MessageRepository messageRepository;
 
-    @Autowired
-    UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public MessageService(MessageRepository messageRepository, UserRepository userRepository) {
+        this.messageRepository = messageRepository;
+        this.userRepository = userRepository;
+    }
 
     int maxLimit = 100;
 
@@ -54,7 +56,7 @@ public class MessageService {
     }
 
     public boolean isValidMessageText(String messageText) {
-        return !messageText.trim().isEmpty();
+        return !messageText.isEmpty();
     }
 
     public class Conversation {

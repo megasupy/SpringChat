@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.HtmlUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -17,8 +16,11 @@ import com.example.demo.Models.Message;
 
 @RestController
 public class MessageController {
-    @Autowired
-    MessageService service;
+    private final MessageService service;
+
+    public MessageController(MessageService service) {
+        this.service = service;
+    }
 
     @GetMapping ("/message")
     public ResponseEntity<String> getConversation(@RequestParam String contact_name, @RequestParam(defaultValue = "50") int limit, @RequestParam(defaultValue = "0") int offset) {
@@ -56,7 +58,7 @@ public class MessageController {
     @PostMapping("/message") 
     public ResponseEntity<String> sendMessage(@RequestParam String contact_name, @RequestParam String message_text) {
         if (!service.isValidMessageText(message_text)) {
-            return ResponseEntity.badRequest().body("Error: Message is Empty!");
+            return ResponseEntity.ok().body("Error: Message is Empty!");
         }
         service.sendMessage(contact_name, message_text);
         return ResponseEntity.ok("Inserted Message");
