@@ -41,6 +41,9 @@ public class MessageService {
         if (!AuthHelper.isLoggedIn()) {
             throw new InsufficientAuthenticationException("Not Authorized to send this message!");
         }
+        else if (!isValidMessageText(messageText)) {
+            throw new IllegalArgumentException("messageText should not be empty!");
+        }
 
         Message msg = new Message();
         msg.recipient_id = userRepository.getByUsername(recipientName).id;
@@ -48,6 +51,10 @@ public class MessageService {
         msg.message = messageText;
 
         messageRepository.insert(msg);
+    }
+
+    public boolean isValidMessageText(String messageText) {
+        return !messageText.trim().isEmpty();
     }
 
     public class Conversation {

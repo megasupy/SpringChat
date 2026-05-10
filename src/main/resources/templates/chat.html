@@ -42,7 +42,7 @@
           hx-target="#messages-response"
           hx-on::after-request="if (event.detail.successful) this.reset()"
         >
-          <textarea name="message_text" placeholder="Type Message"></textarea>
+          <textarea name="message_text" placeholder="Type Message" required minlength="1"></textarea>
           <button type="submit">Send</button>
         </form>
         <span id="chat-spinner" class="htmx-indicator" aria-hidden="true">Loading…</span>

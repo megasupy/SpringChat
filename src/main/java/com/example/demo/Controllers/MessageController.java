@@ -55,6 +55,9 @@ public class MessageController {
 
     @PostMapping("/message") 
     public ResponseEntity<String> sendMessage(@RequestParam String contact_name, @RequestParam String message_text) {
+        if (!service.isValidMessageText(message_text)) {
+            return ResponseEntity.badRequest().body("Error: Message is Empty!");
+        }
         service.sendMessage(contact_name, message_text);
         return ResponseEntity.ok("Inserted Message");
     }
