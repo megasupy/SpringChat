@@ -16,3 +16,4 @@ CREATE TABLE IF NOT EXISTS messages(
     FOREIGN KEY (recipient_id) REFERENCES users(id)
                                    ON DELETE CASCADE
 )
+
