@@ -39,4 +39,4 @@ class MessageTextValidationTest {
 		MessageService service = newService();
 		assertEquals(expected, service.isValidMessageText(text));
 	}
-}
+
